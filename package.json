@@ -1,0 +1,17 @@
+{
+  "name": "exercise",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Avatar Movements",
+  "main": "./core/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tarun",
+  "license": "ISC",
+  "dependencies": {
+    "jsm": "^0.0.1",
+    "three": "^0.143.0"
+  },
+  "devDependencies": {}
+}
