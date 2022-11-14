@@ -1,9 +1,9 @@
 import { GLTFLoader } from "../node_modules/three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "../node_modules/three/build/three.module.js";
-import { plane, spotLight, light } from "./object.js";
-import { CharacterControls } from "./charactercontrols.js";
+import { plane, spotLight, light, wall, rWall, lWall, roof } from "./object.js";
 
 if (typeof window != "undefined") {
+  // let window = document.getElementById("window");
   let keypressed = null;
   const scene = new THREE.Scene();
   var loader = new GLTFLoader();
@@ -13,38 +13,51 @@ if (typeof window != "undefined") {
     0.1,
     1000
   );
-  camera.position.set(0, 15, 35);
+  camera.position.set(0, 15, 55);
 
   scene.add(plane);
   scene.add(spotLight);
   scene.add(light);
+  scene.add(wall);
+  scene.add(rWall);
+  scene.add(lWall);
+  scene.add(roof);
 
   let mixer;
-  // let characterControls;
   let actions = [];
   let toggle = true;
 
   loader.load(
-    "../Models/mod.glb",
+    "../Models/change1.glb",
     function (gltf) {
       const human = gltf.scene;
-      mixer = new THREE.AnimationMixer(human);
-      const clips = gltf.animations;
+      var mat001 = new THREE.MeshPhysicalMaterial();
 
-      const sit = THREE.AnimationClip.findByName(clips, "Situps");
+      gltf.scene.traverse(async function (child) {
+        if (child.isMesh) {
+          const m = child;
+
+          child.material = await mat001;
+          scene.add(m);
+        }
+      });
+      mixer = new THREE.AnimationMixer(human);
+
+      const clips = gltf.animations;
+      const sit = THREE.AnimationClip.findByName(clips, "Squat");
       const situps = mixer.clipAction(sit);
+
       actions.push(situps);
       situps.play();
-      // situps.loop = THREE.LoopOnce;
 
-      // const stand = THREE.AnimationClip.findByName(clips, "StandToIdle");
-      // const standAction = mixer.clipAction(stand);
-      // actions.push(standAction);
-      // stand.loop = THREE.LoopOnce;
-
-      const plank = THREE.AnimationClip.findByName(clips, "StartPlank");
+      const plank = THREE.AnimationClip.findByName(clips, "Dumbbell");
       const plankAction = mixer.clipAction(plank);
+
       actions.push(plankAction);
+
+      // human.rotation.y += 1.4;
+      // human.rotation.z -= 0.2;
+      // human.rotation.x -= 0.2;
       scene.add(human);
     },
     undefined,
@@ -55,7 +68,7 @@ if (typeof window != "undefined") {
 
   const renderer = new THREE.WebGLRenderer();
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth / 2, window.innerHeight / 2);
   document.body.appendChild(renderer.domElement);
 
   //Animation Loop
@@ -78,10 +91,31 @@ if (typeof window != "undefined") {
     } else {
       actions[0].stop();
       actions[1].play();
-      // actions[1].loop = THREE.LoopOnce;
-      // actions[2].play();
     }
     toggle = !toggle;
     keypressed = e.key;
   });
 }
+
+// Comments
+
+// const parser = gltf.parser;
+// const bufferPromises = parser.json.images.map((imageDef) => {
+//   return parser.getDependency("bufferView", imageDef.bufferView);
+// });
+// Promise.all(bufferPromises).then((buffers) => {
+//   console.log(buffers); // Array<ArrayBuffer>
+// });
+// const texture = await parser.getDependency(
+//   "texture",
+//   0 /* textureIndex */
+// );
+
+// part.material = new THREE.MeshPhongMaterial({ map: texture });
+
+// console.log(texture);
+
+// human.material = await new THREE.MeshPhongMaterial({ map: texture });
+
+// actions[1].loop = THREE.LoopOnce;
+// actions[2].play();
